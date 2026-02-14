@@ -60,17 +60,32 @@ regd_users.post("/login", (req, res) => {
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
     let username = req.session.authorization.username;
-    let review = req.query.review;
+    let review = req.query.review2;
     let isbn = parseInt(req.params.isbn);
 
-    // if(books[isbn]===false){
-    //     return res.status(300).send("no existe");
-    // }else{
-    //     return res.status(200).send("existe");
-    // }
-    books[isbn].reviews.username = username;
-    books[isbn].reviews.review = "Bla bla bla";
+    if (!books[isbn]) {
+        return res.status(404).json({ message: "Book not found" });
+    };
 
+
+    books[isbn].reviews[username] = {};
+    //books[isbn].reviews.review = review;
+
+
+    if(books[isbn].reviews[username]){
+        books[isbn].reviews[username].review = review;
+
+    }else{
+        books[isbn].reviews[username].review = review;
+    }
+
+    //books[isbn].reviews[username].review = review;
+
+    // if(books[isbn].reviews.username === username){
+    //   return res.send("existe ya una review de este usuario")
+    // }else{
+    //   return res.send("este user es nuevo");
+    // }
 
     res.send(books);
 });
