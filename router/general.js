@@ -90,4 +90,101 @@ public_users.get("/review/:isbn", function (req, res) {
   res.send(JSON.stringify(books[isbn].reviews));
 });
 
+public_users.get("/all", async (req, res) => {
+  try {
+    // Simular operación asíncrona con los datos locales
+    const getBooks = () => {
+      return new Promise((resolve, reject) => {
+        if (books) {
+          resolve(books);
+        } else {
+          reject("No hay libros disponibles");
+        }
+      });
+    };
+
+    const libros = await getBooks();
+    res.status(200).json(libros);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error",
+      error: error,
+    });
+  }
+});
+
+
+public_users.get("/book/:isbn", async (req, res) => {
+  try {
+    let isbn = parseInt(req.params.isbn);
+    const getBookByIsbn = (isbn) => {
+      return new Promise((resolve, reject) => {
+        if (books[isbn]) {
+          resolve(books[isbn]);
+        } else {
+          reject("There is not book with this isbn yet");
+        }
+      });
+    };
+    const libro = await getBookByIsbn(isbn);
+    res.status(200).json(libro);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error",
+      error: error,
+    });
+  }
+});
+
+public_users.get("/nameAuthor/:author", async (req, res) => {
+  try {
+    let author = req.params.author;
+    const getBookByAuthor = (author) => {
+      return new Promise((resolve, reject) => {
+        let data = Object.entries(books).filter(
+          ([id, libro]) => libro.author === author,
+        );
+        if (data) {
+          resolve(data);
+        } else {
+          reject("There is not book with this author");
+        }
+      });
+    };
+    const libro = await getBookByAuthor(author);
+    res.status(200).json(libro);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error",
+      error: error,
+    });
+  }
+});
+
+public_users.get("/titulo/:title", async (req, res) => {
+  try {
+    let title = req.params.title.replace(/\s+/g, "");
+    const getBookBytitle = (title) => {
+      return new Promise((resolve, reject) => {
+        let data = Object.entries(books).filter(
+          ([id, libro]) => libro.title.replace(/\s+/g, "") === title,
+        );
+
+        if (data) {
+          resolve(data);
+        } else {
+          reject("There is not book with this title yet");
+        }
+      });
+    };
+    const libro = await getBookBytitle(title);
+    res.status(200).json(libro);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error",
+      error: error,
+    });
+  }
+});
+
 module.exports.general = public_users;
